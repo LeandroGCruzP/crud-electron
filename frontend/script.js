@@ -18,6 +18,9 @@ function onSubmit (event) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials)
   })
-    .then(res => console.log('Deu certo', res))
+    .then(() => {
+      sessionStorage.setItem("username", credentials.username)
+      window.location.href = 'home.html'
+    })
     .catch(err => console.log('Deu errado', err))
 }

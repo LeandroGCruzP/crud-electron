@@ -1,0 +1,135 @@
+body {
+  display: flex;
+}
+
+.sidebar {
+  background-color: #A80000;
+  height: 100vh;
+  width: 240px; /* 240px */
+  color: #FFF;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.sidebar .logo {
+  display: flex;
+  justify-content: center;
+  font-size: 1.5rem; /* 24px */
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.sidebar .nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .nav .link {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 10px;
+  border-bottom: 1px solid #E2E2E2;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar .nav .link:hover {
+  filter: brightness(1.2);
+}
+
+.sidebar .personalInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar .personalInfo #iconClose {
+  cursor: pointer;
+}
+
+.sidebar .personalInfo #username {
+  font-size: 0.9375rem; /* 15px */
+}
+
+.content {
+  background-color: #E2E2E2;
+  flex: 1;
+  padding: 10px;
+}
+
+.content .card {
+  background-color: #FFF;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.content .card .header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.content .card .header span {
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+}
+
+.content .card .header button {
+  height: 40px;
+  border-radius: 5px;
+  border: 0;
+  background-color: #A80000;
+  color: #FFF;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.content .card .header button:hover {
+  filter: brightness(1.2);
+}
+
+.content .card .header button:focus {
+  filter: brightness(1.2);
+  outline: none;
+}
+
+.content .card table {
+  width: 100%;
+}
+
+.content .card table thead tr th {
+  text-align: left;
+  padding: 12px 24px;
+  border-bottom: 1px solid #E2E2E2;
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 600;
+  color: #878787;
+}
+
+.content .card table tbody tr td {
+  text-align: left;
+  padding: 12px 24px;
+  border-bottom: 1px solid #E2E2E2;
+  font-size: 0.9375rem; /* 15px */
+}
+
+.content .card table tbody tr td .actions {
+  display: flex;
+  width: min-content;
+  gap: 10px;
+}
+
+.content .card table tbody tr td .actions .action {
+  cursor: pointer;
+}
+
+.content .card table tbody tr td .actions .action:hover {
+  filter: brightness(1.2);
+}

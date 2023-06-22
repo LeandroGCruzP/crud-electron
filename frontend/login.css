@@ -9,11 +9,12 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 0.625rem; /* 10px */
-    width: 25rem; /* 400px */
+    gap: 10px;
+    width: 400px;
     background-color: #FFF;
-    padding: 1.25rem; /* 20px */
+    padding: 20px;
     border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .content .title {
@@ -24,7 +25,7 @@
 .content form {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem; /* 10px */
+    gap: 10px;
     width: 100%;
 }
 
@@ -33,7 +34,7 @@
     height: 40px;
     border-radius: 5px;
     border: 1px solid #E2E2E2;
-    padding: 0 0.625rem; /* 0 10px */
+    padding: 0 10px;
     font-size: 0.9375rem; /* 15px */
 }
 
@@ -51,6 +52,7 @@
     font-size: 0.9375rem; /* 15px */
     font-weight: 600;
     cursor: pointer;
+    padding: 0 10px;
 }
 
 .content form button:hover {
