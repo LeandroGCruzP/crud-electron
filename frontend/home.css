@@ -2,6 +2,167 @@ body {
   display: flex;
 }
 
+button {
+  width: 100%;
+}
+
+button {
+  height: 40px;
+  border-radius: 5px;
+  border: 0;
+  background-color: #A80000;
+  color: #FFF;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+button:hover {
+  filter: brightness(1.2);
+}
+
+button:focus {
+  filter: brightness(1.2);
+  outline: none;
+}
+
+input {
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #E2E2E2;
+  padding: 0 10px;
+  font-size: 0.9375rem; /* 15px */
+  width: 100%;
+}
+
+input:focus {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select {
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #E2E2E2;
+  padding: 0 10px;
+  font-size: 0.9375rem; /* 15px */
+  width: 100%;
+}
+
+select:focus {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select:active {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select:checked {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-create {
+  min-width: 450px;
+  background-color: #FFF;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.modal-create-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-create-header svg {
+  cursor: pointer;
+}
+
+.modal-create-header span {
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+}
+
+.modal-create form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-create .actions {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.modal-create .input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.modal-create .select-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.modal-create .select-form button {
+  padding: 0;
+  width: 40px;
+  align-items: center;
+}
+
+.modal-create .select-form-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.modal-create .select-form-info .info-title {
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+}
+
+.modal-create .select-form-info .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-create .checkbox-form {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.modal-create .checkbox-form .auto-detection-serial-port {
+  height: 15px;
+  width: 15px;
+}
+
+.modal-create form .actions .btn-cancel {
+  background-color: #878787;
+}
+
 .sidebar {
   background-color: #A80000;
   height: 100vh;

@@ -5,6 +5,16 @@
     justify-content: center;
 }
 
+.container .tooltip {
+  display: none;
+  position: absolute;
+  background-color: #A80000;
+  color: #FFF;
+  padding: 10px;
+  border-radius: 5px;
+  top: 20px;
+}
+
 .content {
     display: flex;
     align-items: center;

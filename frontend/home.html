@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' http://localhost:3333">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' http://192.168.0.159:4000">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Document</title>
@@ -10,6 +10,91 @@
   <link rel="stylesheet" href="home.css">
 </head>
 <body>
+  <div class="overlay">
+    <div class="modal-create">
+      <div class="modal-create-header">
+        <span>Adicionar dispositivo</span>
+
+        <svg width="22" height="22" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.0844 18.9785C20.157 19.051 20.2146 19.1372 20.2539 19.2321C20.2931 19.3269 20.3134 19.4285 20.3134 19.5312C20.3134 19.6338 20.2931 19.7355 20.2539 19.8303C20.2146 19.9252 20.157 20.0113 20.0844 20.0839C20.0118 20.1565 19.9257 20.2141 19.8308 20.2534C19.736 20.2927 19.6343 20.3129 19.5317 20.3129C19.429 20.3129 19.3274 20.2927 19.2325 20.2534C19.1377 20.2141 19.0515 20.1565 18.979 20.0839L12.5004 13.6044L6.02192 20.0839C5.87532 20.2305 5.6765 20.3129 5.46918 20.3129C5.26187 20.3129 5.06304 20.2305 4.91645 20.0839C4.76986 19.9373 4.6875 19.7385 4.6875 19.5312C4.6875 19.3239 4.76986 19.1251 4.91645 18.9785L11.3959 12.4999L4.91645 6.02143C4.76986 5.87484 4.6875 5.67601 4.6875 5.4687C4.6875 5.26138 4.76986 5.06256 4.91645 4.91596C5.06304 4.76937 5.26187 4.68701 5.46918 4.68701C5.6765 4.68701 5.87532 4.76937 6.02192 4.91596L12.5004 11.3955L18.979 4.91596C19.1255 4.76937 19.3244 4.68701 19.5317 4.68701C19.739 4.68701 19.9378 4.76937 20.0844 4.91596C20.231 5.06256 20.3134 5.26138 20.3134 5.4687C20.3134 5.67601 20.231 5.87484 20.0844 6.02143L13.6049 12.4999L20.0844 18.9785Z" fill="black"/>
+        </svg>
+      </div>
+
+      <form>
+        <div class="input-form">
+          <label for="name">Nome</label>
+          <input type="text" id="name" name="name" autofocus />
+        </div>
+
+        <div class="select-form">
+          <div class="input-form">
+            <label for="serial-port">Porta Serial</label>
+            <select name="serial-port" id="serial-port">
+              <option value="COM1">COM1</option>
+              <option value="COM2">COM2</option>
+              <option value="COM3">COM3</option>
+              <option value="COM4">COM4</option>
+            </select>
+          </div>
+
+          <button>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21.888 13.5C21.164 18.311 17.013 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C16.1 2 19.625 4.468 21.168 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 8H21.4C21.4788 8 21.5568 7.98448 21.6296 7.95433C21.7024 7.92417 21.7685 7.87998 21.8243 7.82426C21.88 7.76855 21.9242 7.70241 21.9543 7.62961C21.9845 7.55681 22 7.47879 22 7.4V3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="select-form-info">
+          <span class="info-title">Central identificada:</span>
+          <div class="info">
+            <span>Modelo: - | Versão: -</span>
+            <span>Número Serial: -</span>
+          </div>
+
+          <div class="checkbox-form">
+            <input type="checkbox" name="auto-detection-serial-port" class="auto-detection-serial-port">
+            <span>Detecção automática de porta serial</span>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="serial-number">Número Serial</label>
+          <input type="text" id="serial-number" name="serial-number" />
+        </div>
+
+        <div class="input-form">
+          <label for="">Modo de Sincronização</label>
+          <select name="" id="">
+            <option value="item1">item 1</option>
+            <option value="item2">item 2</option>
+          </select>
+        </div>
+
+        <div class="input-form">
+          <label for="">Fila remota</label>
+          <select name="" id="">
+            <option value="item1">item 1</option>
+            <option value="item2">item 2</option>
+          </select>
+        </div>
+
+        <div class="input-form">
+          <label for="">Item Padrão</label>
+          <select name="" id="">
+            <option value="item1">item 1</option>
+            <option value="item2">item 2</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn-cancel">Cancelar</button>
+          <button type="submit">Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="sidebar">
     <div>
       <div class="logo">
@@ -65,32 +150,7 @@
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Central 1</td>
-            <td>[01|02|03]</td>
-            <td>COM1</td>
-            <td>123456</td>
-            <td>Local</td>
-            <td>Conectado</td>
-            <td>
-              <div class="actions">
-                <div class="action">
-                  <svg width="24" height="24" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4.69408 17.3854L17.9508 4.12755C18.4746 3.62636 19.1737 3.35015 19.8986 3.35808C20.6234 3.366 21.3164 3.65742 21.829 4.16993C22.3417 4.68244 22.6333 5.37531 22.6414 6.10017C22.6496 6.82503 22.3735 7.52426 21.8725 8.04813L8.61358 21.306C8.31112 21.6085 7.92588 21.8146 7.50642 21.8985L3.25 22.75L4.1015 18.4925C4.1854 18.0731 4.39159 17.6878 4.69408 17.3854Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M15.708 7.0415L18.958 10.2915" stroke="black" stroke-width="2"/>
-                  </svg>
-                </div>
-
-                <div class="action">
-                  <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.99967 22.1667C6.99967 22.7855 7.24551 23.379 7.68309 23.8166C8.12068 24.2542 8.71417 24.5 9.33301 24.5H18.6663C19.2852 24.5 19.8787 24.2542 20.3163 23.8166C20.7538 23.379 20.9997 22.7855 20.9997 22.1667V8.16667H6.99967V22.1667ZM9.33301 10.5H18.6663V22.1667H9.33301V10.5ZM18.083 4.66667L16.9163 3.5H11.083L9.91634 4.66667H5.83301V7H22.1663V4.66667H18.083Z" fill="#FF0000"/>
-                  </svg>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>

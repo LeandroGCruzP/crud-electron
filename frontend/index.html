@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' http://localhost:3333">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' http://192.168.0.159:4000">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Aceno</title>
@@ -12,18 +12,22 @@
 
   <body>
     <div class="container">
+      <div class="tooltip" id="tooltip">
+        <span class="tooltip-error" id="tooltip-error"></span>
+      </div>
+
       <div class="content">
-        <span class="title">CREATE USER</span>
+        <span class="title">LOGIN</span>
 
         <form>
           <input type="text" id="username" autofocus />
           <input type="password" id="password" />
 
-          <button type="submit">Criar</button>
+          <button type="submit">Entrar</button>
         </form>
       </div>
     </div>
 
-    <script src="./script.js"></script>
+    <script src="./login.js"></script>
   </body>
 </html>
