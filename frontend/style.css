@@ -9,3 +9,66 @@ body {
     background: #ececec;
     color: #000;
 }
+
+button {
+  width: 100%;
+}
+
+button {
+  height: 40px;
+  border-radius: 5px;
+  border: 0;
+  background-color: #A80000;
+  color: #FFF;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+button:hover {
+  filter: brightness(1.2);
+}
+
+button:focus {
+  filter: brightness(1.2);
+  outline: none;
+}
+
+input {
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #E2E2E2;
+  padding: 0 10px;
+  font-size: 0.9375rem; /* 15px */
+  width: 100%;
+}
+
+input:focus {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select {
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #E2E2E2;
+  padding: 0 10px;
+  font-size: 0.9375rem; /* 15px */
+  width: 100%;
+}
+
+select:focus {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select:active {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}
+
+select:checked {
+  filter: brightness(1.2);
+  outline-color: #A80000;
+}

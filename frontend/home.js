@@ -1,9 +1,10 @@
+// Get username and token from sessionStorage and get devices from API
 function getInfoSessionStorage() {
-  const username = sessionStorage.getItem('username');
-  const token = sessionStorage.getItem('token');
+  const username = sessionStorage.getItem('username')
+  const token = sessionStorage.getItem('token')
 
-  const usernameElement = document.getElementById('username')
-  usernameElement.textContent = username
+  const userLogged = document.querySelector('.user-logged')
+  userLogged.textContent = username
 
   fetch("http://192.168.0.159:4000/api/devices", {
     method: "GET",
@@ -14,9 +15,7 @@ function getInfoSessionStorage() {
   })
     .then(res => res.json())
     .then(res => {
-      console.log(res)
-
-      const tbody = document.getElementById('tbody');
+      const tbody = document.querySelector('tbody')
 
       res.devices.map(device => {
         const row = `
@@ -50,14 +49,143 @@ function getInfoSessionStorage() {
       })
     })
     .catch(err => console.log(err))
+
+  fetch("http://192.168.0.159:4000/api/system/ports", {
+    method: "GET",
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then(res => {
+      const serialPort = document.querySelector('#serial-port')
+
+      res.ports.map(port => {
+        const option = `<option value="${port}">${port}</option>`
+
+        serialPort.innerHTML += option
+      })
+    })
+    .catch(err => console.log(err))
 }
 
-getInfoSessionStorage();
+getInfoSessionStorage()
 
-const iconClose = document.getElementById('iconClose');
-iconClose.addEventListener('click', handleCloseApplication)
+const toast = document.getElementById("toast")
+const toastText = document.getElementById("toast-error")
 
-function handleCloseApplication () {
-  sessionStorage.clear();
-  window.location.href = './index.html';
+const modal = document.querySelector('.modal')
+const btnOpenModal = document.querySelector('.btn-create')
+const btnCloseModal = document.querySelector('.btn-close')
+const btnCancelModal = document.querySelector('.btn-cancel')
+const btnLogout = document.querySelector('.btn-logout')
+
+const form = document.querySelector('form')
+const inputName = document.getElementById('name')
+const selectSerialPort = document.getElementById('serial-port')
+const checkboxConnectionMode = document.getElementById('connection-mode')
+const selectSerialNumber = document.getElementById('serial-number')
+const selectSyncMode = document.getElementById('sync-mode')
+const selectRemoteQueue = document.getElementById('remote-queue')
+const selectDefaultRemoteItem = document.getElementById('remote-item')
+
+window.addEventListener('click', handlePressOutModal)
+btnOpenModal.addEventListener('click', openModal)
+btnCloseModal.addEventListener('click', closeModal)
+btnCancelModal.addEventListener('click', closeModal)
+btnLogout.addEventListener('click', logout)
+
+form.addEventListener('submit', createDevice)
+
+
+function createDevice (event) {
+  event.preventDefault()
+
+  const deviceData = {
+    name: inputName.value,
+    serialPort: selectSerialPort.value,
+    connectionMode: checkboxConnectionMode.checked ? 'Auto' : 'Fixed',
+    serialNumber: selectSerialNumber.value,
+    syncMode: selectSyncMode.value,
+    remoteQueue: selectRemoteQueue.value,
+    defaultRemoteItem: selectDefaultRemoteItem.value,
+  }
+
+  fetch("http://192.168.0.159:4000/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(deviceData)
+  })
+    .then(res => {
+      if (!res.ok) {
+
+        if(res.status === 401) {
+          toast.style.display = 'flex'
+
+          // logout
+          sessionStorage.clear()
+          window.location.href = './index.html'
+
+          throw new Error('Usuário sem token de acesso')
+        }
+
+        toast.style.display = 'flex'
+        toastText.innerHTML = 'Erro ao adicionar dispositivo'
+        throw new Error('Erro ao adicionar dispositivo')
+      }
+
+      return res.json()
+    })
+    .then(() => {
+      toast.style.display = 'flex'
+      toast.style.backgroundColor = '#009688'
+      toastText.innerHTML = 'Dispositivo adicionado com sucesso'
+
+      inputName.value = ''
+      selectSerialPort.value = ''
+      checkboxConnectionMode.checked = false
+      selectSerialNumber.value = ''
+      selectSyncMode.value = ''
+      selectRemoteQueue.value = ''
+      selectDefaultRemoteItem.value = ''
+
+      modal.close()
+    })
+    .catch(err => console.log(err))
+    .finally(() => {
+      setTimeout(() => {
+        toast.style.display = "none"
+      }, 3000)
+    })
 }
+
+function logout () {
+  sessionStorage.clear()
+  window.location.href = './index.html'
+}
+
+function handlePressOutModal(event) {
+  if (event.target === modal) {
+    closeModal()
+  }
+}
+
+function closeModal () {
+  inputName.value = ''
+  selectSerialPort.value = ''
+  checkboxConnectionMode.checked = false
+  selectSerialNumber.value = ''
+  selectSyncMode.value = ''
+  selectRemoteQueue.value = ''
+  selectDefaultRemoteItem.value = ''
+
+  modal.close()
+}
+
+function openModal () {
+  modal.showModal()
+}
+

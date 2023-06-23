@@ -5,7 +5,7 @@
     justify-content: center;
 }
 
-.container .tooltip {
+.container .toast {
   display: none;
   position: absolute;
   background-color: #A80000;

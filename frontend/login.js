@@ -22,17 +22,17 @@ function onSubmit (event) {
   })
     .then(res => {
       if (!res.ok) {
-        const tooltip = document.getElementById("tooltip")
-        const tooltipText = document.getElementById("tooltip-error")
+        const toast = document.getElementById("toast")
+        const toastText = document.getElementById("toast-error")
 
         if(res.status === 401) {
-          tooltip.style.display = 'flex'
-          tooltipText.innerHTML = 'Usuário ou senha inválidos'
+          toast.style.display = 'flex'
+          toastText.innerHTML = 'Usuário ou senha inválidos'
           throw new Error('Usuário ou senha inválidos')
         }
 
-        tooltip.style.display = 'flex'
-        tooltipText.innerHTML = 'Servidor indisponível'
+        toast.style.display = 'flex'
+        toastText.innerHTML = 'Servidor indisponível'
         throw new Error('Servidor indisponível')
       }
 
