@@ -27,11 +27,13 @@ function onSubmit (event) {
 
         if(res.status === 401) {
           toast.style.display = 'flex'
+          toast.style.backgroundColor = "#A80000"
           toastText.innerHTML = 'Usuário ou senha inválidos'
           throw new Error('Usuário ou senha inválidos')
         }
 
         toast.style.display = 'flex'
+        toast.style.backgroundColor = "#A80000"
         toastText.innerHTML = 'Servidor indisponível'
         throw new Error('Servidor indisponível')
       }

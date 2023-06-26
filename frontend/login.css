@@ -39,7 +39,6 @@
     width: 100%;
 }
 
-
 .content form input {
     height: 40px;
     border-radius: 5px;
@@ -50,7 +49,7 @@
 
 .content form input:focus {
     filter: brightness(1.2);
-    outline-color: #A80000;
+    border-color: #A80000;
 }
 
 .content form button {

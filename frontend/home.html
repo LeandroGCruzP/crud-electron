@@ -94,13 +94,13 @@
       </div>
 
       <div class="container-form-field">
-        <div class="form-field">
-          <label for="serial-port">Porta Serial</label>
-          <select id="serial-port">
-          </select>
+        <div class="form-field-select-editable">
+          <label for="editable-serial-port">Porta Serial</label>
+          <select id="serial-port"></select>
+          <input type="text" id="editable-serial-port" name="editable-serial-port" />
         </div>
 
-        <button type="button" class="btn-load-serial-port">
+        <button type="button" id="btn-load-serial-port">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M21.888 13.5C21.164 18.311 17.013 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C16.1 2 19.625 4.468 21.168 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M17 8H21.4C21.4788 8 21.5568 7.98448 21.6296 7.95433C21.7024 7.92417 21.7685 7.87998 21.8243 7.82426C21.88 7.76855 21.9242 7.70241 21.9543 7.62961C21.9845 7.55681 22 7.47879 22 7.4V3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -111,8 +111,8 @@
       <div class="container-form-field-info">
         <span class="title">Central identificada:</span>
         <div class="info">
-          <span>Modelo: - | Versão: -</span>
-          <span>Número Serial: -</span>
+          <span id="info-model-version">Modelo: - | Versão: -</span>
+          <span id="info-serial-number">Número Serial: -</span>
         </div>
 
         <div class="checkbox-container">
@@ -123,7 +123,13 @@
 
       <div class="form-field">
         <label for="serial-number">Número Serial</label>
-        <input type="text" id="serial-number" name="serial-number" />
+        <div class="container-serial-number">
+          <input type="text" id="serial-number" name="serial-number" />
+          <svg id="copy-to-clipboard" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="8" width="12" height="12" rx="2" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 2H6C4.89543 2 4 2.89543 4 4V14C4 15.1046 4.89543 16 6 16H8" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </div>
 
       <div class="form-field">
@@ -137,12 +143,12 @@
 
       <div class="form-field">
         <label for="remote-queue">Fila remota</label>
-        <input type="text" id="remote-queue" name="remote-queue" autofocus />
+        <input type="text" id="remote-queue" name="remote-queue" />
       </div>
 
       <div class="form-field">
         <label for="remote-item">Item Padrão</label>
-        <input type="text" id="remote-item" name="remote-item" autofocus />
+        <input type="text" id="remote-item" name="remote-item" />
       </div>
 
       <div class="actions">

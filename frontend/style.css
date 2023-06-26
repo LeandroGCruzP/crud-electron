@@ -1,13 +1,13 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 
 body {
-    background: #ececec;
-    color: #000;
+  background: #ececec;
+  color: #000;
 }
 
 button {
@@ -42,11 +42,12 @@ input {
   padding: 0 10px;
   font-size: 0.9375rem; /* 15px */
   width: 100%;
+  outline: none;
 }
 
 input:focus {
   filter: brightness(1.2);
-  outline-color: #A80000;
+  border: 1px solid #CA0000;
 }
 
 select {
@@ -56,19 +57,20 @@ select {
   padding: 0 10px;
   font-size: 0.9375rem; /* 15px */
   width: 100%;
+  outline: none;
 }
 
 select:focus {
   filter: brightness(1.2);
-  outline-color: #A80000;
+  border: 1px solid #CA0000;
 }
 
 select:active {
   filter: brightness(1.2);
-  outline-color: #A80000;
+  border: 1px solid #CA0000;
 }
 
 select:checked {
   filter: brightness(1.2);
-  outline-color: #A80000;
+  border: 1px solid #CA0000;
 }
