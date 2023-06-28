@@ -87,9 +87,39 @@ main .content header {
   margin-bottom: 10px;
 }
 
+main .content header .content-title {
+  display: flex;
+  gap: 10px;
+}
+
 main .content header .title {
   font-size: 1.0625rem; /* 17px */
   font-weight: 600;
+}
+
+main .content header .spinner {
+  height: 15px;
+  width: 15px;
+  border: 1px solid;
+  border-color: #000000 transparent #000000 transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+main .content header .actions {
+  display: flex;
+  gap: 5px;
+}
+
+main .content header .btn-refetch {
+  width: min-content;
+  background-color: #878787;
 }
 
 main .content header .btn-create {

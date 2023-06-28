@@ -7,6 +7,9 @@ const containerToast = document.querySelector("#toast")
 const spanToast = document.querySelector("#toast-error")
 
 const modal = document.querySelector(".modal")
+// Show when devices is loading
+const spinner = document.querySelector(".spinner")
+const btnRefetchDevices = document.querySelector(".btn-refetch")
 const btnOpenModal = document.querySelector(".btn-create")
 const btnCloseModal = document.querySelector(".btn-close")
 const btnCancelModal = document.querySelector(".btn-cancel")
@@ -45,6 +48,7 @@ inputSerialPort.value = selectSerialPort.value
 spanUserLogged.textContent = username
 
 // * --------------------------- Add event listeners ---------------------------
+btnRefetchDevices.addEventListener("click", getDevices)
 btnOpenModal.addEventListener("click", openModal)
 btnCloseModal.addEventListener("click", closeModal)
 btnCancelModal.addEventListener("click", closeModal)
@@ -66,36 +70,36 @@ inputSerialPort.addEventListener("focusout", () => selectSerialPort.style.border
 
 // * Validate fields
 inputName.addEventListener("input", e => {
-  const errorMessage = inputName.parentNode.querySelector(".error-message")
+  const errorMessageName = inputName.parentNode.querySelector(".error-message")
 
-  if (!errorMessage && e.target.value === "") {
+  if (!errorMessageName && e.target.value === "") {
     setSpanError(e.target, "Este campo é obrigatório")
-  } else if (errorMessage && e.target.value !== "") {
-    errorMessage.remove()
+  } else if (errorMessageName && e.target.value !== "") {
+    errorMessageName.remove()
   }
 })
 
 inputSerialPort.addEventListener("input", e => {
-  const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+  const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
 
-  if (!errorMessage && e.target.value === "") {
+  if (!errorMessageContainerFormField && e.target.value === "") {
     setSpanError(containerFormField, "Este campo é obrigatório")
-  } else if (errorMessage && e.target.value !== "") {
-    errorMessage.remove()
+  } else if (errorMessageContainerFormField && e.target.value !== "") {
+    errorMessageContainerFormField.remove()
   }
 })
 
 checkboxConnectionMode.addEventListener("click", () => {
-  const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+  const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
   const errorMessageSerialNumber = inputSerialNumber.parentNode.querySelector(".error-message")
 
-  if (!errorMessage && !checkboxConnectionMode.checked && selectSerialPort.value === "") {
+  if (!errorMessageContainerFormField && !checkboxConnectionMode.checked && selectSerialPort.value === "") {
     setSpanError(containerFormField, "Este campo é obrigatório")
-  } else if (errorMessage && checkboxConnectionMode.checked) {
-    errorMessage.remove()
+  } else if (errorMessageContainerFormField && checkboxConnectionMode.checked) {
+    errorMessageContainerFormField.remove()
   }
 
-  if (!errorMessageSerialNumber && checkboxConnectionMode.checked && selectSerialPort.value === "") {
+  if (!errorMessageSerialNumber && checkboxConnectionMode.checked && inputSerialNumber.value === "") {
     setSpanError(inputSerialNumber, "Este campo é obrigatório")
   } else if (errorMessageSerialNumber && !checkboxConnectionMode.checked) {
     errorMessageSerialNumber.remove()
@@ -103,23 +107,63 @@ checkboxConnectionMode.addEventListener("click", () => {
 })
 
 inputSerialNumber.addEventListener("input", e => {
-  const errorMessage = inputSerialNumber.parentNode.querySelector(".error-message")
+  const errorMessageSerialNumber = inputSerialNumber.parentNode.querySelector(".error-message")
 
-  if (!errorMessage && checkboxConnectionMode.checked && e.target.value === "") {
+  if (!errorMessageSerialNumber && checkboxConnectionMode.checked && e.target.value === "") {
     setSpanError(e.target, "Este campo é obrigatório")
-  } else if (errorMessage && e.target.value !== "") {
-    errorMessage.remove()
+  } else if (errorMessageSerialNumber && e.target.value !== "") {
+    errorMessageSerialNumber.remove()
+  }
+})
+
+inputRemoteQueue.addEventListener("input", e => {
+  const errorMessageRemoteQueue = inputRemoteQueue.parentNode.querySelector(".error-message")
+
+  if (!errorMessageRemoteQueue && e.target.value === "") {
+    setSpanError(e.target, "Este campo é obrigatório")
+  } else if (errorMessageRemoteQueue && e.target.value !== "") {
+    errorMessageRemoteQueue.remove()
+  }
+})
+
+inputDefaultRemoteItem.addEventListener("input", e => {
+  const errorMessageDefaultRemoteItem = inputDefaultRemoteItem.parentNode.querySelector(".error-message")
+
+  if (!errorMessageDefaultRemoteItem && e.target.value === "") {
+    setSpanError(e.target, "Este campo é obrigatório")
+  } else if (errorMessageDefaultRemoteItem && e.target.value !== "") {
+    errorMessageDefaultRemoteItem.remove()
+  }
+})
+
+selectSyncMode.addEventListener("change", e => {
+  const errorMessageRemoteQueue = inputRemoteQueue.parentNode.querySelector(".error-message")
+  const errorMessageDefaultRemoteItem = inputDefaultRemoteItem.parentNode.querySelector(".error-message")
+
+  if (!errorMessageRemoteQueue && e.target.value !== "Local") {
+    setSpanError(inputRemoteQueue, "Este campo é obrigatório")
+  } else if (errorMessageRemoteQueue && e.target.value === "Local") {
+    errorMessageRemoteQueue.remove()
+  }
+
+  if (!errorMessageDefaultRemoteItem && e.target.value !== "Local") {
+    setSpanError(inputDefaultRemoteItem, "Este campo é obrigatório")
+  } else if (errorMessageDefaultRemoteItem && e.target.value === "Local") {
+    errorMessageDefaultRemoteItem.remove()
   }
 })
 
 // * --------------------------- List all devices ---------------------------
-fetch("http://192.168.0.159:4000/api/devices", {
+function getDevices () {
+  fetch("http://192.168.0.159:4000/api/devices", {
   method: "GET",
   headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
 })
   .then(res => res.json())
   .then(res => {
     const tbody = document.querySelector("tbody")
+
+    tbody.innerHTML = ""
 
     res.devices.map(device => {
       const row = `
@@ -157,9 +201,13 @@ fetch("http://192.168.0.159:4000/api/devices", {
 
     logout()
   })
+}
+
+getDevices()
 
 // * --------------------------- List all ports ---------------------------
-fetch("http://192.168.0.159:4000/api/system/ports", {
+function getPorts () {
+  fetch("http://192.168.0.159:4000/api/system/ports", {
   method: "GET",
   headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
 })
@@ -167,38 +215,61 @@ fetch("http://192.168.0.159:4000/api/system/ports", {
   .then(res => {
     const serialPort = document.querySelector("#serial-port")
 
+    serialPort.innerHTML = ""
+
     res.ports.map(port => {
-      const option = `<option value="${port}">${port}</option>`
+      option = `<option value="${port}">${port}</option>`
 
       serialPort.innerHTML += option
     })
   })
   .catch(() => {
-    toast("error", "Erro ao listar os dispositivos")
+    toast("error", "Erro ao listar as portas")
   })
+}
+
+getPorts()
 
 // * --------------------------- Functions ---------------------------
 function createDevice (event) {
   event.preventDefault()
 
   // * validate fields before submit to API
-  if (inputName.value === "" || (inputSerialPort.value === "" && !checkboxConnectionMode.checked) || (inputSerialNumber.value === "" && checkboxConnectionMode.checked)) {
+  if (
+    inputName.value === "" ||
+    (inputSerialPort.value === "" && !checkboxConnectionMode.checked) ||
+    (inputSerialNumber.value === "" && checkboxConnectionMode.checked) ||
+    (inputRemoteQueue.value === "" && selectSyncMode.value !== "Local") ||
+    (inputDefaultRemoteItem.value === "" && selectSyncMode.value !== "Local")
+  ) {
     if (inputName.value === "") {
-      const errorMessage = inputName.parentNode.querySelector(".error-message")
+      const errorMessageName = inputName.parentNode.querySelector(".error-message")
 
-      !errorMessage && setSpanError(inputName, "Este campo é obrigatório")
+      !errorMessageName && setSpanError(inputName, "Este campo é obrigatório")
     }
 
     if (inputSerialPort.value === "" && !checkboxConnectionMode.checked) {
-      const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+      const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
 
-      !errorMessage && setSpanError(containerFormField, "Este campo é obrigatório")
+      !errorMessageContainerFormField && setSpanError(containerFormField, "Este campo é obrigatório")
     }
 
     if (inputSerialNumber.value === "" && checkboxConnectionMode.checked) {
-      const errorMessage = inputSerialNumber.parentNode.querySelector(".error-message")
+      const errorMessageSerialNumber = inputSerialNumber.parentNode.querySelector(".error-message")
 
-      !errorMessage && setSpanError(inputSerialNumber, "Este campo é obrigatório")
+      !errorMessageSerialNumber && setSpanError(inputSerialNumber, "Este campo é obrigatório")
+    }
+
+    if (inputRemoteQueue.value === "" && selectSyncMode.value !== "Local") {
+      const errorMessageRemoteQueue = inputRemoteQueue.parentNode.querySelector(".error-message")
+
+      !errorMessageRemoteQueue && setSpanError(inputRemoteQueue, "Este campo é obrigatório")
+    }
+
+    if (inputDefaultRemoteItem.value === "" && selectSyncMode.value !== "Local") {
+      const errorMessageDefaultRemoteItem = inputDefaultRemoteItem.parentNode.querySelector(".error-message")
+
+      !errorMessageDefaultRemoteItem && setSpanError(inputDefaultRemoteItem, "Este campo é obrigatório")
     }
 
     return
@@ -206,12 +277,12 @@ function createDevice (event) {
 
   const deviceData = {
     name: inputName.value,
-    serialPort: inputSerialPort.value,
+    serialPort: inputSerialPort.value ? inputSerialPort.value : undefined,
     connectionMode: checkboxConnectionMode.checked ? "Auto" : "Fixed",
-    serialNumber: inputSerialNumber.value,
+    serialNumber: inputSerialNumber.value ? serialNumber.value : undefined,
     syncMode: selectSyncMode.value,
-    remoteQueue: inputRemoteQueue.value,
-    defaultRemoteItem: inputDefaultRemoteItem.value,
+    remoteQueue: inputRemoteQueue.value ? inputRemoteQueue.value : undefined,
+    defaultRemoteItem: inputDefaultRemoteItem.value ? inputDefaultRemoteItem.value : undefined,
   }
 
   // * Create devices
@@ -224,18 +295,16 @@ function createDevice (event) {
       if (!res.ok) {
         if(res.status === 401) {
           logout()
-
           toast("error", "Usuário sem token de acesso")
         }
 
         toast("error", "Erro ao adicionar dispositivo")
+        throw new Error("Erro ao adicionar dispositivo")
       }
 
-      return res.json()
-    })
-    .then(() => {
       toast("success", "Dispositivo adicionado com sucesso")
-
+      getDevices()
+      getPorts()
       closeModal()
     })
     .catch(err => console.error(err))
@@ -311,20 +380,47 @@ function logout () {
 
 function closeModal () {
   inputName.value = ""
-  selectSerialPort.selectedIndex = 0
-  checkboxConnectionMode.checked = false
-  inputSerialNumber.value = ""
-  selectSyncMode.selectedIndex = 0
-  inputRemoteQueue.value = ""
-  inputDefaultRemoteItem.value = ""
 
+  selectSerialPort.selectedIndex = 0
   selectSerialPort.disabled = false
   selectSerialPort.style.cursor = "auto"
+  selectSerialPort.style.backgroundColor = "#FFFFFF"
+  inputSerialPort.value = selectSerialPort.value
   inputSerialPort.disabled = false
   inputSerialPort.style.cursor = "text"
+  inputSerialPort.style.backgroundColor = "#FFFFFF"
+
   btnLoadSerialPort.disabled = false
   btnLoadSerialPort.style.cursor = "pointer"
   btnLoadSerialPort.style.backgroundColor = "#A80000"
+
+  checkboxConnectionMode.checked = false
+
+  inputSerialNumber.value = ""
+
+  selectSyncMode.selectedIndex = 0
+
+  inputRemoteQueue.value = ""
+  inputRemoteQueue.disabled = true
+  inputRemoteQueue.style.cursor = "not-allowed"
+  inputRemoteQueue.style.backgroundColor = "#EEEEEE"
+
+  inputDefaultRemoteItem.value = ""
+  inputDefaultRemoteItem.disabled = true
+  inputDefaultRemoteItem.style.cursor = "not-allowed"
+  inputDefaultRemoteItem.style.backgroundColor = "#EEEEEE"
+
+  const errorMessageName = inputName.parentNode.querySelector(".error-message")
+  const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
+  const errorMessageSerialNumber = inputSerialNumber.parentNode.querySelector(".error-message")
+  const errorMessageRemoteQueue = inputRemoteQueue.parentNode.querySelector(".error-message")
+  const errorMessageDefaultRemoteItem = inputDefaultRemoteItem.parentNode.querySelector(".error-message")
+
+  errorMessageName && errorMessageName.remove()
+  errorMessageContainerFormField && errorMessageContainerFormField.remove()
+  errorMessageSerialNumber && errorMessageSerialNumber.remove()
+  errorMessageRemoteQueue && errorMessageRemoteQueue.remove()
+  errorMessageDefaultRemoteItem && errorMessageDefaultRemoteItem.remove()
 
   modal.close()
 }
@@ -401,23 +497,6 @@ function handleSyncMode () {
 
   collection[selectSyncMode.value]()
 }
-
-// function validateInput(event, parameter) {
-//   const inputElement = event.target
-//   const errorMessage = inputElement.parentNode.querySelector(".error-message")
-
-//   const collection = {
-//     require: () => {
-//       if (!errorMessage && inputElement.value === "") {
-//         setSpanError(inputElement, "Este campo é obrigatório")
-//       } else if (errorMessage && inputElement.value !== "") {
-//         errorMessage.remove()
-//       }
-//     }
-//   }
-
-//   collection[parameter]()
-// }
 
 function setSpanError (inputAbove, message) {
   const spanError = document.createElement("span")
