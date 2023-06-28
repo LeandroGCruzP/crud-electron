@@ -1,15 +1,121 @@
+// * --------------------------- Session storage ---------------------------
 const username = sessionStorage.getItem("username")
 const token = sessionStorage.getItem("token")
 
-const userLogged = document.querySelector(".user-logged")
-userLogged.textContent = username
+// * --------------------------- Elements from DOM ---------------------------
+const containerToast = document.querySelector("#toast")
+const spanToast = document.querySelector("#toast-error")
 
+const modal = document.querySelector(".modal")
+const btnOpenModal = document.querySelector(".btn-create")
+const btnCloseModal = document.querySelector(".btn-close")
+const btnCancelModal = document.querySelector(".btn-cancel")
+const btnLogout = document.querySelector(".btn-logout")
+
+const form = document.querySelector("form")
+const inputName = document.querySelector("#name")
+const selectSerialPort = document.querySelector("#serial-port")
+const inputSerialPort = document.querySelector("#editable-serial-port")
+const btnLoadSerialPort = document.querySelector("#btn-load-serial-port")
+const containerFormField = document.querySelector(".container-form-field")
+const spanInfoModelVersion = document.querySelector("#info-model-version")
+const spanInfoSerialNumber = document.querySelector("#info-serial-number")
+const checkboxConnectionMode = document.querySelector("#connection-mode")
+const inputSerialNumber = document.querySelector("#serial-number")
+const iconCopyToClipboard = document.querySelector("#copy-to-clipboard")
+const selectSyncMode = document.querySelector("#sync-mode")
+const inputRemoteQueue = document.querySelector("#remote-queue")
+const inputDefaultRemoteItem = document.querySelector("#remote-item")
+
+const spanUserLogged = document.querySelector(".user-logged")
+
+// * --------------------------- Initial values to elements ---------------------------
+inputRemoteQueue.value = ""
+inputRemoteQueue.disabled = true
+inputRemoteQueue.style.cursor = "not-allowed"
+inputRemoteQueue.style.backgroundColor = "#EEEEEE"
+
+inputDefaultRemoteItem.value = ""
+inputDefaultRemoteItem.disabled = true
+inputDefaultRemoteItem.style.cursor = "not-allowed"
+inputDefaultRemoteItem.style.backgroundColor = "#EEEEEE"
+
+inputSerialPort.value = selectSerialPort.value
+
+spanUserLogged.textContent = username
+
+// * --------------------------- Add event listeners ---------------------------
+btnOpenModal.addEventListener("click", openModal)
+btnCloseModal.addEventListener("click", closeModal)
+btnCancelModal.addEventListener("click", closeModal)
+btnLogout.addEventListener("click", logout)
+
+form.addEventListener("submit", createDevice)
+checkboxConnectionMode.addEventListener("click", handleCheckbox)
+iconCopyToClipboard.addEventListener("click", handleCopyToClipboard)
+selectSyncMode.addEventListener("change", handleSyncMode)
+
+selectSerialPort.addEventListener("change", () => inputSerialPort.value = selectSerialPort.value)
+selectSerialPort.addEventListener("click", () => inputSerialPort.value = selectSerialPort.value)
+btnLoadSerialPort.addEventListener("click", handleLoadSerialPort)
+btnLoadSerialPort.addEventListener("mouseover", () => btnLoadSerialPort.style.filter = "brightness(1.2)")
+btnLoadSerialPort.addEventListener("mouseleave", () => btnLoadSerialPort.style.filter = "brightness(1)")
+inputSerialPort.addEventListener("input", () => selectSerialPort.value = inputSerialPort.value)
+inputSerialPort.addEventListener("focus", () => selectSerialPort.style.border = "1px solid #CA0000")
+inputSerialPort.addEventListener("focusout", () => selectSerialPort.style.border = "1px solid #E2E2E2")
+
+// * Validate fields
+inputName.addEventListener("input", e => {
+  const errorMessage = inputName.parentNode.querySelector(".error-message")
+
+  if (!errorMessage && e.target.value === "") {
+    setSpanError(e.target, "Este campo é obrigatório")
+  } else if (errorMessage && e.target.value !== "") {
+    errorMessage.remove()
+  }
+})
+
+inputSerialPort.addEventListener("input", e => {
+  const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+
+  if (!errorMessage && e.target.value === "") {
+    setSpanError(containerFormField, "Este campo é obrigatório")
+  } else if (errorMessage && e.target.value !== "") {
+    errorMessage.remove()
+  }
+})
+
+checkboxConnectionMode.addEventListener("click", () => {
+  const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+  const errorMessageSerialNumber = inputSerialNumber.parentNode.querySelector(".error-message")
+
+  if (!errorMessage && !checkboxConnectionMode.checked && selectSerialPort.value === "") {
+    setSpanError(containerFormField, "Este campo é obrigatório")
+  } else if (errorMessage && checkboxConnectionMode.checked) {
+    errorMessage.remove()
+  }
+
+  if (!errorMessageSerialNumber && checkboxConnectionMode.checked && selectSerialPort.value === "") {
+    setSpanError(inputSerialNumber, "Este campo é obrigatório")
+  } else if (errorMessageSerialNumber && !checkboxConnectionMode.checked) {
+    errorMessageSerialNumber.remove()
+  }
+})
+
+inputSerialNumber.addEventListener("input", e => {
+  const errorMessage = inputSerialNumber.parentNode.querySelector(".error-message")
+
+  if (!errorMessage && checkboxConnectionMode.checked && e.target.value === "") {
+    setSpanError(e.target, "Este campo é obrigatório")
+  } else if (errorMessage && e.target.value !== "") {
+    errorMessage.remove()
+  }
+})
+
+// * --------------------------- List all devices ---------------------------
 fetch("http://192.168.0.159:4000/api/devices", {
   method: "GET",
-  headers: {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json"
-  }
+  headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
 })
   .then(res => res.json())
   .then(res => {
@@ -46,14 +152,16 @@ fetch("http://192.168.0.159:4000/api/devices", {
       tbody.innerHTML += row
     })
   })
-  .catch(err => console.log(err))
+  .catch(() => {
+    toast("error", "Erro ao listar os dispositivos")
 
+    logout()
+  })
+
+// * --------------------------- List all ports ---------------------------
 fetch("http://192.168.0.159:4000/api/system/ports", {
   method: "GET",
-  headers: {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json"
-  }
+  headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
 })
   .then(res => res.json())
   .then(res => {
@@ -65,108 +173,36 @@ fetch("http://192.168.0.159:4000/api/system/ports", {
       serialPort.innerHTML += option
     })
   })
-  .catch(err => console.log(err))
-
-
-const toast = document.getElementById("toast")
-const toastText = document.getElementById("toast-error")
-
-const modal = document.querySelector(".modal")
-const btnOpenModal = document.querySelector(".btn-create")
-const btnCloseModal = document.querySelector(".btn-close")
-const btnCancelModal = document.querySelector(".btn-cancel")
-const btnLogout = document.querySelector(".btn-logout")
-
-const form = document.querySelector("form")
-const inputName = document.getElementById("name")
-const selectSerialPort = document.getElementById("serial-port")
-const inputSerialPort = document.getElementById("editable-serial-port")
-const btnLoadSerialPort = document.getElementById("btn-load-serial-port")
-const textInfoModelVersion = document.getElementById("info-model-version")
-const textInfoSerialNumber = document.getElementById("info-serial-number")
-const checkboxConnectionMode = document.getElementById("connection-mode")
-const inputSerialNumber = document.getElementById("serial-number")
-const copyToClipboard = document.getElementById("copy-to-clipboard")
-const selectSyncMode = document.getElementById("sync-mode")
-const inputRemoteQueue = document.getElementById("remote-queue")
-const inputDefaultRemoteItem = document.getElementById("remote-item")
-
-inputSerialPort.value = selectSerialPort.value
-
-inputRemoteQueue.value = ""
-inputRemoteQueue.disabled = true
-inputRemoteQueue.style.cursor = "not-allowed"
-inputRemoteQueue.style.backgroundColor = "#EEEEEE"
-
-inputDefaultRemoteItem.value = ""
-inputDefaultRemoteItem.disabled = true
-inputDefaultRemoteItem.style.cursor = "not-allowed"
-inputDefaultRemoteItem.style.backgroundColor = "#EEEEEE"
-
-btnOpenModal.addEventListener("click", openModal)
-btnCloseModal.addEventListener("click", closeModal)
-btnCancelModal.addEventListener("click", closeModal)
-btnLogout.addEventListener("click", logout)
-
-form.addEventListener("submit", createDevice)
-checkboxConnectionMode.addEventListener("click", handleCheckbox)
-btnLoadSerialPort.addEventListener("mouseover", () => btnLoadSerialPort.style.filter = "brightness(1.2)")
-btnLoadSerialPort.addEventListener("mouseleave", () => btnLoadSerialPort.style.filter = "brightness(1)")
-btnLoadSerialPort.addEventListener("click", handleLoadSerialPort)
-
-selectSerialPort.addEventListener("change", () => inputSerialPort.value = selectSerialPort.value)
-inputSerialPort.addEventListener("input", () => selectSerialPort.value = inputSerialPort.value)
-selectSerialPort.addEventListener("click", () => inputSerialPort.value = selectSerialPort.value)
-inputSerialPort.addEventListener("focus", () => selectSerialPort.style.border = "1px solid #CA0000")
-inputSerialPort.addEventListener("focusout", () => selectSerialPort.style.border = "1px solid #E2E2E2")
-
-copyToClipboard.addEventListener("click", handleCopyToClipboard)
-selectSyncMode.addEventListener("change", handleSyncMode)
-
-
-function handleLoadSerialPort () {
-  fetch("http://192.168.0.159:4000/api/system/serial", {
-    method: "GET",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+  .catch(() => {
+    toast("error", "Erro ao listar os dispositivos")
   })
-    .then(res => res.json())
-    .then(res => {
-      res.devices.map(device => {
-        if(inputSerialPort.value === device.port) {
-          inputSerialNumber.value = device.serialNumber
-          textInfoModelVersion.innerHTML = `Modelo: ${device.model} | Versão: ${device.fw_ver}`
-          textInfoSerialNumber.innerHTML = `Número Serial: ${device.serialNumber}`
-        }
-      })
-    })
-    .catch(err => console.log(err))
-}
 
-function handleCopyToClipboard() {
-  const text = inputSerialNumber.value
-
-  navigator.clipboard.writeText(text)
-    .then(() => {
-      toast.style.display = "flex"
-      toast.style.zIndex = "9999999"
-      toast.style.backgroundColor = "#009688"
-      toastText.innerHTML = "Número serial copiado"
-    })
-    .catch((error) => {
-      console.error('Failed to copy text to clipboard:', error)
-    })
-    .finally(() => {
-      setTimeout(() => {
-        toast.style.display = "none"
-      }, 3000)
-    })
-}
-
+// * --------------------------- Functions ---------------------------
 function createDevice (event) {
   event.preventDefault()
+
+  // * validate fields before submit to API
+  if (inputName.value === "" || (inputSerialPort.value === "" && !checkboxConnectionMode.checked) || (inputSerialNumber.value === "" && checkboxConnectionMode.checked)) {
+    if (inputName.value === "") {
+      const errorMessage = inputName.parentNode.querySelector(".error-message")
+
+      !errorMessage && setSpanError(inputName, "Este campo é obrigatório")
+    }
+
+    if (inputSerialPort.value === "" && !checkboxConnectionMode.checked) {
+      const errorMessage = containerFormField.parentNode.querySelector(".error-message")
+
+      !errorMessage && setSpanError(containerFormField, "Este campo é obrigatório")
+    }
+
+    if (inputSerialNumber.value === "" && checkboxConnectionMode.checked) {
+      const errorMessage = inputSerialNumber.parentNode.querySelector(".error-message")
+
+      !errorMessage && setSpanError(inputSerialNumber, "Este campo é obrigatório")
+    }
+
+    return
+  }
 
   const deviceData = {
     name: inputName.value,
@@ -178,49 +214,94 @@ function createDevice (event) {
     defaultRemoteItem: inputDefaultRemoteItem.value,
   }
 
+  // * Create devices
   fetch("http://192.168.0.159:4000/api/devices", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify(deviceData)
   })
     .then(res => {
       if (!res.ok) {
         if(res.status === 401) {
-          toast.style.display = "flex"
-          toast.style.backgroundColor = "#A80000"
-          toastText.innerHTML = "Usuário sem token de acesso"
+          logout()
 
-          // logout
-          sessionStorage.clear()
-          window.location.href = "./index.html"
-
-          throw new Error("Usuário sem token de acesso")
+          toast("error", "Usuário sem token de acesso")
         }
 
-        toast.style.display = "flex"
-        toast.style.backgroundColor = "#A80000"
-        toastText.innerHTML = "Erro ao adicionar dispositivo"
-        throw new Error("Erro ao adicionar dispositivo")
+        toast("error", "Erro ao adicionar dispositivo")
       }
 
       return res.json()
     })
     .then(() => {
-      toast.style.display = "flex"
-      toast.style.backgroundColor = "#009688"
-      toastText.innerHTML = "Dispositivo adicionado com sucesso"
+      toast("success", "Dispositivo adicionado com sucesso")
 
       closeModal()
     })
-    .catch(err => console.log(err))
-    .finally(() => {
-      setTimeout(() => {
-        toast.style.display = "none"
-      }, 3000)
+    .catch(err => console.error(err))
+}
+
+function handleLoadSerialPort () {
+  // * List serial number
+  fetch(`http://192.168.0.159:4000/api/system/serial?port=${inputSerialPort.value}`, {
+    method: "GET",
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
+  })
+    .then(res => {
+      if (!res.ok) {
+        toast("error", "Erro ao carregar porta serial")
+      } else {
+        return res.json()
+      }
     })
+    .then(res => {
+      res.devices.map(device => {
+        if(device.port === inputSerialPort.value) {
+          inputSerialNumber.value = device.serialNumber
+          spanInfoModelVersion.innerHTML = `Modelo: ${device.model} | Versão: ${device.fw_ver}`
+          spanInfoSerialNumber.innerHTML = `Número Serial: ${device.serialNumber}`
+        } else {
+          inputSerialNumber.value = ""
+          spanInfoModelVersion.innerHTML = `Modelo: - | Versão: -`
+          spanInfoSerialNumber.innerHTML = `Número Serial: -`
+        }
+      })
+    })
+    .catch(() => {
+      setSpanError(containerFormField, "Porta serial não identificada")
+
+      inputSerialNumber.value = ""
+      spanInfoModelVersion.innerHTML = `Modelo: - | Versão: -`
+      spanInfoSerialNumber.innerHTML = `Número Serial: -`
+    })
+}
+
+function handleCopyToClipboard() {
+  const text = inputSerialNumber.value
+
+  navigator.clipboard.writeText(text)
+    .then(() => toast("success", "Número serial copiado"))
+    .catch((error) => console.error("Failed to copy text to clipboard:", error))
+}
+
+function toast (type, message) {
+  if (type === "error") {
+    containerToast.style.display = "flex"
+    containerToast.style.backgroundColor = "#A80000"
+    spanToast.innerHTML = message
+
+    setTimeout(() => containerToast.style.display = "none", 3000)
+
+    throw new Error(message)
+  }
+
+  if (type === "success") {
+    containerToast.style.display = "flex"
+    containerToast.style.backgroundColor = "#009688"
+    spanToast.innerHTML = message
+
+    setTimeout(() => containerToast.style.display = "none", 3000)
+  }
 }
 
 function logout () {
@@ -269,13 +350,6 @@ function handleCheckbox () {
     btnLoadSerialPort.style.cursor = "not-allowed"
     btnLoadSerialPort.style.backgroundColor = "#878787"
     btnLoadSerialPort.style.filter = "brightness(1)"
-
-    inputSerialNumber.value = ""
-    inputSerialNumber.disabled = true
-    inputSerialNumber.style.cursor = "not-allowed"
-    inputSerialNumber.style.backgroundColor = "#EEEEEE"
-
-    copyToClipboard.style.cursor = "not-allowed"
   } else {
     selectSerialPort.selectedIndex = 0
     selectSerialPort.disabled = false
@@ -289,12 +363,6 @@ function handleCheckbox () {
     btnLoadSerialPort.disabled = false
     btnLoadSerialPort.style.cursor = "pointer"
     btnLoadSerialPort.style.backgroundColor = "#A80000"
-
-    inputSerialNumber.disabled = false
-    inputSerialNumber.style.cursor = "text"
-    inputSerialNumber.style.backgroundColor = "transparent"
-
-    copyToClipboard.style.cursor = "pointer"
   }
 }
 
@@ -332,4 +400,28 @@ function handleSyncMode () {
   }
 
   collection[selectSyncMode.value]()
+}
+
+// function validateInput(event, parameter) {
+//   const inputElement = event.target
+//   const errorMessage = inputElement.parentNode.querySelector(".error-message")
+
+//   const collection = {
+//     require: () => {
+//       if (!errorMessage && inputElement.value === "") {
+//         setSpanError(inputElement, "Este campo é obrigatório")
+//       } else if (errorMessage && inputElement.value !== "") {
+//         errorMessage.remove()
+//       }
+//     }
+//   }
+
+//   collection[parameter]()
+// }
+
+function setSpanError (inputAbove, message) {
+  const spanError = document.createElement("span")
+  spanError.textContent = `* ${message}`
+  spanError.classList.add("error-message")
+  inputAbove.parentNode.appendChild(spanError)
 }

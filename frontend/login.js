@@ -48,7 +48,7 @@ function onSubmit (event) {
     .catch(err => console.log(err))
     .finally(() => {
       setTimeout(() => {
-        tooltip.style.display = "none"
+        toast.style.display = "none"
       }, 3000)
     })
 }

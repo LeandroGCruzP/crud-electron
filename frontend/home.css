@@ -175,6 +175,11 @@ main .content table tbody td .actions .action:hover {
   width: 100%;
 }
 
+.modal form .error-message {
+  font-size: 0.8125rem; /* 13px */
+  color: #A80000;
+}
+
 .modal form .container-form-field {
   display: flex;
   align-items: flex-end;
