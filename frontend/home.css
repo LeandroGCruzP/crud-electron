@@ -153,15 +153,23 @@ main .content table tbody td .actions {
   gap: 10px;
 }
 
-main .content table tbody td .actions .action {
+main .content table tbody td .actions .action-update {
   cursor: pointer;
 }
 
-main .content table tbody td .actions .action:hover {
+main .content table tbody td .actions .action-update:hover {
   filter: brightness(1.2);
 }
 
-.modal {
+main .content table tbody td .actions .action-delete {
+  cursor: pointer;
+}
+
+main .content table tbody td .actions .action-delete:hover {
+  filter: brightness(1.2);
+}
+
+dialog {
   margin: auto;
   padding: 10px;
   max-width: 50ch;
@@ -171,110 +179,130 @@ main .content table tbody td .actions .action:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.modal::backdrop {
+dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal header {
+dialog header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
 }
 
-.modal header .title {
+dialog header .title {
   font-size: 1.0625rem; /* 17px */
   font-weight: 600;
 }
 
-.modal header .btn-close {
+.modal-delete header .btn-close-modal-delete {
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
-.modal form {
+.modal-delete main {
+  background-color: transparent;
+}
+
+.modal-delete footer {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.modal-delete footer .btn-cancel-modal-delete {
+  background-color: #878787;
+}
+
+.modal-create header .btn-close-modal-create {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.modal-create form {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.modal form .form-field {
+.modal-create form .form-field {
   display: flex;
   flex-direction: column;
   gap: 5px;
   width: 100%;
 }
 
-.modal form .error-message {
+.modal-create form .error-message {
   font-size: 0.8125rem; /* 13px */
   color: #A80000;
 }
 
-.modal form .container-form-field {
+.modal-create form .container-form-field {
   display: flex;
   align-items: flex-end;
   gap: 10px;
 }
 
-.modal form .form-field-select-editable {
+.modal-create form .form-field-select-editable {
   position: relative;
   display: inline-block;
   width: 100%;
 }
 
-.modal form .container-form-field #btn-load-serial-port {
+.modal-create form .container-form-field #btn-load-serial-port {
   padding: 0;
   width: 50px;
   align-items: center;
   justify-content: center;
 }
 
-.modal form .container-form-field-info {
+.modal-create form .container-form-field-info {
   display: flex;
   flex-direction: column;
   gap: 10px;
   width: 100%;
 }
 
-.modal form .container-form-field-info .title {
+.modal-create form .container-form-field-info .title {
   font-size: 0.9375rem; /* 15px */
   font-weight: 600;
 }
 
-.modal form .container-form-field-info .info {
+.modal-create form .container-form-field-info .info {
   display: flex;
   flex-direction: column;
 }
 
-.modal form .checkbox-container {
+.modal-create form .checkbox-container {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.modal form .checkbox-container .checkbox {
+.modal-create form .checkbox-container .checkbox {
   height: 15px;
   width: 15px;
 }
 
-.modal form .container-serial-number {
+.modal-create form .container-serial-number {
   position: relative;
 }
 
-.modal form .container-serial-number svg {
+.modal-create form .container-serial-number svg {
   position: absolute;
   top: 10px;
   right: 2px;
   cursor: pointer;
 }
 
-.modal form .actions {
+.modal-create form .actions {
   display: flex;
   width: 100%;
   gap: 10px;
 }
 
-.modal form .actions .btn-cancel {
+.modal-create form .actions .btn-cancel-modal-create {
   background-color: #878787;
 }
