@@ -1,6 +1,6 @@
 const ERROR_MESSAGE = {
-  500: "Servidor indisponível",
-  401: "Usuário ou senha inválidos"
+  401: "Usuário ou senha inválidos",
+  500: "Servidor indisponível"
 }
 
 const form = document.querySelector("form")
@@ -44,7 +44,7 @@ function onSubmit (event) {
         toast("error", ERROR_MESSAGE[500])
       }
 
-      console.log("[ERROR LOGIN]", err)
+      console.error("[ERROR LOGIN] >", err.message)
     })
 }
 

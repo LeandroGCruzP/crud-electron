@@ -98,6 +98,7 @@ main .content header .title {
 }
 
 main .content header .spinner {
+  display: none;
   height: 15px;
   width: 15px;
   border: 1px solid;
