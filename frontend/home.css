@@ -223,19 +223,6 @@ main .content table tbody td .actions .action:hover {
   width: 100%;
 }
 
-.modal form #editable-serial-port {
-  position: absolute;
-  top: 18px;
-  left: 0;
-  width: 90%;
-  border: none;
-  background: transparent;
-  box-sizing: border-box;
-  font-family: inherit;
-  padding-left: 15px;
-  outline: none;
-}
-
 .modal form .container-form-field #btn-load-serial-port {
   padding: 0;
   width: 50px;

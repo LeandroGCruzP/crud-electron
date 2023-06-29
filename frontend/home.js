@@ -1,20 +1,21 @@
-// * --------------------------- Session storage ---------------------------
+// * --------------------------- Errors messages ---------------------------
 const ERROR_MESSAGE = {
   "401-devices": "Erro ao listar os dispositivos",
   "401-ports": "Erro ao listar as portas",
   500: "Servidor indisponível"
 }
 
+const URL_API_SERVER = "http://192.168.0.159:4000/api"
+
 // * --------------------------- Session storage ---------------------------
 const username = sessionStorage.getItem("username")
 const token = sessionStorage.getItem("token")
 
 // * --------------------------- Elements from DOM ---------------------------
-const containerToast = document.querySelector("#toast")
+const divToast = document.querySelector("#toast")
 const spanToast = document.querySelector("#toast-error")
 
 const modal = document.querySelector(".modal")
-// Show when devices is loading
 const spinner = document.querySelector(".spinner")
 const btnRefetchDevices = document.querySelector(".btn-refetch")
 const btnOpenModal = document.querySelector(".btn-create")
@@ -25,7 +26,6 @@ const btnLogout = document.querySelector(".btn-logout")
 const form = document.querySelector("form")
 const inputName = document.querySelector("#name")
 const selectSerialPort = document.querySelector("#serial-port")
-const inputSerialPort = document.querySelector("#editable-serial-port")
 const btnLoadSerialPort = document.querySelector("#btn-load-serial-port")
 const containerFormField = document.querySelector(".container-form-field")
 const spanInfoModelVersion = document.querySelector("#info-model-version")
@@ -50,8 +50,6 @@ inputDefaultRemoteItem.disabled = true
 inputDefaultRemoteItem.style.cursor = "not-allowed"
 inputDefaultRemoteItem.style.backgroundColor = "#EEEEEE"
 
-inputSerialPort.value = selectSerialPort.value
-
 spanUserLogged.textContent = username
 
 // * --------------------------- Add event listeners ---------------------------
@@ -66,14 +64,9 @@ checkboxConnectionMode.addEventListener("click", handleCheckbox)
 iconCopyToClipboard.addEventListener("click", handleCopyToClipboard)
 selectSyncMode.addEventListener("change", handleSyncMode)
 
-selectSerialPort.addEventListener("change", () => inputSerialPort.value = selectSerialPort.value)
-selectSerialPort.addEventListener("click", () => inputSerialPort.value = selectSerialPort.value)
 btnLoadSerialPort.addEventListener("click", handleLoadSerialPort)
 btnLoadSerialPort.addEventListener("mouseover", () => btnLoadSerialPort.style.filter = "brightness(1.2)")
 btnLoadSerialPort.addEventListener("mouseleave", () => btnLoadSerialPort.style.filter = "brightness(1)")
-inputSerialPort.addEventListener("input", () => selectSerialPort.value = inputSerialPort.value)
-inputSerialPort.addEventListener("focus", () => selectSerialPort.style.border = "1px solid #CA0000")
-inputSerialPort.addEventListener("focusout", () => selectSerialPort.style.border = "1px solid #E2E2E2")
 
 // * Validate fields
 inputName.addEventListener("input", e => {
@@ -86,7 +79,7 @@ inputName.addEventListener("input", e => {
   }
 })
 
-inputSerialPort.addEventListener("input", e => {
+selectSerialPort.addEventListener("change", e => {
   const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
 
   if (!errorMessageContainerFormField && e.target.value === "") {
@@ -164,7 +157,7 @@ selectSyncMode.addEventListener("change", e => {
 function getDevices () {
   spinner.style.display = "flex"
 
-  fetch("http://192.168.0.159:4000/api/devices", {
+  fetch(`${URL_API_SERVER}/devices`, {
     method: "GET",
     headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
   })
@@ -228,7 +221,7 @@ getDevices()
 
 // * --------------------------- List all ports ---------------------------
 function getPorts () {
-  fetch("http://192.168.0.159:4000/api/system/ports", {
+  fetch(`${URL_API_SERVER}/system/ports`, {
   method: "GET",
   headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
 })
@@ -269,7 +262,7 @@ function createDevice (event) {
   // * validate fields before submit to API
   if (
     inputName.value === "" ||
-    (inputSerialPort.value === "" && !checkboxConnectionMode.checked) ||
+    (selectSerialPort.value === "" && !checkboxConnectionMode.checked) ||
     (inputSerialNumber.value === "" && checkboxConnectionMode.checked) ||
     (inputRemoteQueue.value === "" && selectSyncMode.value !== "Local") ||
     (inputDefaultRemoteItem.value === "" && selectSyncMode.value !== "Local")
@@ -280,7 +273,7 @@ function createDevice (event) {
       !errorMessageName && setSpanError(inputName, "Este campo é obrigatório")
     }
 
-    if (inputSerialPort.value === "" && !checkboxConnectionMode.checked) {
+    if (selectSerialPort.value === "" && !checkboxConnectionMode.checked) {
       const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
 
       !errorMessageContainerFormField && setSpanError(containerFormField, "Este campo é obrigatório")
@@ -309,7 +302,7 @@ function createDevice (event) {
 
   const deviceData = {
     name: inputName.value,
-    serialPort: inputSerialPort.value ? inputSerialPort.value : undefined,
+    serialPort: selectSerialPort.value ? selectSerialPort.value : undefined,
     connectionMode: checkboxConnectionMode.checked ? "Auto" : "Fixed",
     serialNumber: inputSerialNumber.value ? serialNumber.value : undefined,
     syncMode: selectSyncMode.value,
@@ -318,13 +311,14 @@ function createDevice (event) {
   }
 
   // * Create devices
-  fetch("http://192.168.0.159:4000/api/devices", {
+  fetch(`${URL_API_SERVER}/devices`, {
     method: "POST",
     headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify(deviceData)
   })
     .then(res => {
       if (!res.ok) {
+        console.log(res)
         toast("error", "Erro ao adicionar dispositivo")
         throw new Error("Erro ao adicionar dispositivo")
       }
@@ -334,12 +328,14 @@ function createDevice (event) {
       getPorts()
       closeModal()
     })
-    .catch(err => console.error('[ERROR CREATE DEVICE] >', err.message))
+    .catch(err => {
+      console.error('[ERROR CREATE DEVICE] >', err.message)
+    })
 }
 
 function handleLoadSerialPort () {
   // * List serial number
-  fetch(`http://192.168.0.159:4000/api/system/serial?port=${inputSerialPort.value}`, {
+  fetch(`${URL_API_SERVER}/system/serial?port=${selectSerialPort.value}`, {
     method: "GET",
     headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
   })
@@ -353,7 +349,7 @@ function handleLoadSerialPort () {
     })
     .then(res => {
       res.devices.map(device => {
-        if(device.port === inputSerialPort.value) {
+        if(device.port === selectSerialPort.value) {
           inputSerialNumber.value = device.serialNumber
           spanInfoModelVersion.innerHTML = `Modelo: ${device.model} | Versão: ${device.fw_ver}`
           spanInfoSerialNumber.innerHTML = `Número Serial: ${device.serialNumber}`
@@ -389,19 +385,19 @@ function handleCopyToClipboard() {
 
 function toast (type, message) {
   if (type === "error") {
-    containerToast.style.display = "flex"
-    containerToast.style.backgroundColor = "#A80000"
+    divToast.style.display = "flex"
+    divToast.style.backgroundColor = "#A80000"
     spanToast.innerHTML = message
 
-    setTimeout(() => containerToast.style.display = "none", 3000)
+    setTimeout(() => divToast.style.display = "none", 3000)
   }
 
   if (type === "success") {
-    containerToast.style.display = "flex"
-    containerToast.style.backgroundColor = "#009688"
+    divToast.style.display = "flex"
+    divToast.style.backgroundColor = "#009688"
     spanToast.innerHTML = message
 
-    setTimeout(() => containerToast.style.display = "none", 3000)
+    setTimeout(() => divToast.style.display = "none", 3000)
   }
 }
 
@@ -417,10 +413,6 @@ function closeModal () {
   selectSerialPort.disabled = false
   selectSerialPort.style.cursor = "auto"
   selectSerialPort.style.backgroundColor = "#FFFFFF"
-  inputSerialPort.value = selectSerialPort.value
-  inputSerialPort.disabled = false
-  inputSerialPort.style.cursor = "text"
-  inputSerialPort.style.backgroundColor = "#FFFFFF"
 
   btnLoadSerialPort.disabled = false
   btnLoadSerialPort.style.cursor = "pointer"
@@ -458,8 +450,6 @@ function closeModal () {
 }
 
 function openModal () {
-  inputSerialPort.value = selectSerialPort.value
-
   modal.showModal()
 }
 
@@ -470,10 +460,6 @@ function handleCheckbox () {
     selectSerialPort.style.cursor = "not-allowed"
     selectSerialPort.style.backgroundColor = "#EEEEEE"
 
-    inputSerialPort.value = ""
-    inputSerialPort.disabled = true
-    inputSerialPort.style.cursor = "not-allowed"
-
     btnLoadSerialPort.disabled = true
     btnLoadSerialPort.style.cursor = "not-allowed"
     btnLoadSerialPort.style.backgroundColor = "#878787"
@@ -483,10 +469,6 @@ function handleCheckbox () {
     selectSerialPort.disabled = false
     selectSerialPort.style.cursor = "auto"
     selectSerialPort.style.backgroundColor = "transparent"
-
-    inputSerialPort.disabled = false
-    inputSerialPort.style.cursor = "text"
-    inputSerialPort.value = selectSerialPort.value
 
     btnLoadSerialPort.disabled = false
     btnLoadSerialPort.style.cursor = "pointer"
