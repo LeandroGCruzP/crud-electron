@@ -1,4 +1,12 @@
+const ERROR_MESSAGE = {
+  500: "Servidor indisponível",
+  401: "Usuário ou senha inválidos"
+}
+
 const form = document.querySelector("form")
+
+const containerToast = document.getElementById("toast")
+const spanToast = document.getElementById("toast-error")
 
 form.addEventListener("submit", onSubmit)
 
@@ -15,27 +23,13 @@ function onSubmit (event) {
 
   fetch("http://192.168.0.159:4000/api/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(loginData)
   })
     .then(res => {
       if (!res.ok) {
-        const toast = document.getElementById("toast")
-        const toastText = document.getElementById("toast-error")
-
-        if(res.status === 401) {
-          toast.style.display = 'flex'
-          toast.style.backgroundColor = "#A80000"
-          toastText.innerHTML = 'Usuário ou senha inválidos'
-          throw new Error('Usuário ou senha inválidos')
-        }
-
-        toast.style.display = 'flex'
-        toast.style.backgroundColor = "#A80000"
-        toastText.innerHTML = 'Servidor indisponível'
-        throw new Error('Servidor indisponível')
+        toast("error", ERROR_MESSAGE[res.status])
+        throw new Error(ERROR_MESSAGE[res.status])
       }
 
       return res.json()
@@ -43,12 +37,31 @@ function onSubmit (event) {
     .then(res => {
       sessionStorage.setItem("username", loginData.username)
       sessionStorage.setItem("token", res.token)
-      window.location.href = 'home.html'
+      window.location.href = "home.html"
     })
-    .catch(err => console.log(err))
-    .finally(() => {
-      setTimeout(() => {
-        toast.style.display = "none"
-      }, 3000)
+    .catch(err => {
+      if (err.message === "Failed to fetch") {
+        toast("error", ERROR_MESSAGE[500])
+      }
+
+      console.log("[ERROR LOGIN]", err)
     })
+}
+
+function toast (type, message) {
+  if (type === "error") {
+    containerToast.style.display = "flex"
+    containerToast.style.backgroundColor = "#A80000"
+    spanToast.innerHTML = message
+
+    setTimeout(() => containerToast.style.display = "none", 3000)
+  }
+
+  if (type === "success") {
+    containerToast.style.display = "flex"
+    containerToast.style.backgroundColor = "#009688"
+    spanToast.innerHTML = message
+
+    setTimeout(() => containerToast.style.display = "none", 3000)
+  }
 }
