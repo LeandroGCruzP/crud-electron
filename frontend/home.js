@@ -1,4 +1,4 @@
-// * --------------------------- Errors messages ---------------------------
+// * ----------------------------------------------------------------------------------------------- Variables
 const ERROR_MESSAGE = {
   "401-devices": "Erro ao listar os dispositivos",
   "401-ports": "Erro ao listar as portas",
@@ -7,11 +7,11 @@ const ERROR_MESSAGE = {
 
 const URL_API_SERVER = "http://192.168.0.159:4000/api"
 
-// * --------------------------- Session storage ---------------------------
+// * ----------------------------------------------------------------------------------------------- Session storage
 const username = sessionStorage.getItem("username")
 const token = sessionStorage.getItem("token")
 
-// * --------------------------- Elements from DOM ---------------------------
+// * ----------------------------------------------------------------------------------------------- Elements DOM
 const divToast = document.querySelector("#toast")
 const spanToast = document.querySelector("#toast-error")
 
@@ -39,7 +39,7 @@ const inputDefaultRemoteItem = document.querySelector("#remote-item")
 
 const spanUserLogged = document.querySelector(".user-logged")
 
-// * --------------------------- Initial values to elements ---------------------------
+// * ----------------------------------------------------------------------------------------------- Initial load
 inputRemoteQueue.value = ""
 inputRemoteQueue.disabled = true
 inputRemoteQueue.style.cursor = "not-allowed"
@@ -52,8 +52,11 @@ inputDefaultRemoteItem.style.backgroundColor = "#EEEEEE"
 
 spanUserLogged.textContent = username
 
-// * --------------------------- Add event listeners ---------------------------
-btnRefetchDevices.addEventListener("click", () => { getDevices(), getPorts() })
+listDevices()
+listPorts()
+
+// * ----------------------------------------------------------------------------------------------- Add event listeners
+btnRefetchDevices.addEventListener("click", () => { listDevices(), listPorts() })
 btnOpenModal.addEventListener("click", openModal)
 btnCloseModal.addEventListener("click", closeModal)
 btnCancelModal.addEventListener("click", closeModal)
@@ -61,10 +64,10 @@ btnLogout.addEventListener("click", logout)
 
 form.addEventListener("submit", createDevice)
 checkboxConnectionMode.addEventListener("click", handleCheckbox)
-iconCopyToClipboard.addEventListener("click", handleCopyToClipboard)
+iconCopyToClipboard.addEventListener("click", copyToClipboard)
 selectSyncMode.addEventListener("change", handleSyncMode)
 
-btnLoadSerialPort.addEventListener("click", handleLoadSerialPort)
+btnLoadSerialPort.addEventListener("click", listSerialPort)
 btnLoadSerialPort.addEventListener("mouseover", () => btnLoadSerialPort.style.filter = "brightness(1.2)")
 btnLoadSerialPort.addEventListener("mouseleave", () => btnLoadSerialPort.style.filter = "brightness(1)")
 
@@ -153,8 +156,8 @@ selectSyncMode.addEventListener("change", e => {
   }
 })
 
-// * --------------------------- List all devices ---------------------------
-function getDevices () {
+// * ----------------------------------------------------------------------------------------------- Functions
+function listDevices () {
   spinner.style.display = "flex"
 
   fetch(`${URL_API_SERVER}/devices`, {
@@ -210,17 +213,14 @@ function getDevices () {
         toast("error", ERROR_MESSAGE[500])
       }
 
-      console.error('[ERROR LIST DEVICES] >', err.message)
+      console.error("[ERROR LIST DEVICES] >", err.message)
     })
     .finally(() => {
       setTimeout(() => spinner.style.display = "none", 1000)
     })
 }
 
-getDevices()
-
-// * --------------------------- List all ports ---------------------------
-function getPorts () {
+function listPorts () {
   fetch(`${URL_API_SERVER}/system/ports`, {
   method: "GET",
   headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
@@ -249,13 +249,10 @@ function getPorts () {
       toast("error", ERROR_MESSAGE[500])
     }
 
-    console.error('[ERROR LIST PORTS] >', err.message)
+    console.error("[ERROR LIST PORTS] >", err.message)
   })
 }
 
-getPorts()
-
-// * --------------------------- Functions ---------------------------
 function createDevice (event) {
   event.preventDefault()
 
@@ -304,13 +301,12 @@ function createDevice (event) {
     name: inputName.value,
     serialPort: selectSerialPort.value ? selectSerialPort.value : undefined,
     connectionMode: checkboxConnectionMode.checked ? "Auto" : "Fixed",
-    serialNumber: inputSerialNumber.value ? serialNumber.value : undefined,
+    serialNumber: inputSerialNumber.value ? inputSerialNumber.value : undefined,
     syncMode: selectSyncMode.value,
     remoteQueue: inputRemoteQueue.value ? inputRemoteQueue.value : undefined,
     defaultRemoteItem: inputDefaultRemoteItem.value ? inputDefaultRemoteItem.value : undefined,
   }
 
-  // * Create devices
   fetch(`${URL_API_SERVER}/devices`, {
     method: "POST",
     headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
@@ -319,22 +315,21 @@ function createDevice (event) {
     .then(res => {
       if (!res.ok) {
         console.log(res)
-        toast("error", "Erro ao adicionar dispositivo")
+        toast("error", "Erro ao adicionar dispositivo") // TODO: accept all erros with different messages
         throw new Error("Erro ao adicionar dispositivo")
       }
 
       toast("success", "Dispositivo adicionado com sucesso")
-      getDevices()
-      getPorts()
+      listDevices()
+      listPorts()
       closeModal()
     })
     .catch(err => {
-      console.error('[ERROR CREATE DEVICE] >', err.message)
+      console.error("[ERROR CREATE DEVICE] >", err.message)
     })
 }
 
-function handleLoadSerialPort () {
-  // * List serial number
+function listSerialPort () {
   fetch(`${URL_API_SERVER}/system/serial?port=${selectSerialPort.value}`, {
     method: "GET",
     headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
@@ -365,7 +360,11 @@ function handleLoadSerialPort () {
         toast("error", ERROR_MESSAGE[500])
       }
 
-      setSpanError(containerFormField, "Porta serial não identificada")
+      const errorMessageContainerFormField = containerFormField.parentNode.querySelector(".error-message")
+
+      if(errorMessageContainerFormField) {
+        setSpanError(containerFormField, "Porta serial não identificada")
+      }
 
       inputSerialNumber.value = ""
       spanInfoModelVersion.innerHTML = `Modelo: - | Versão: -`
@@ -375,7 +374,7 @@ function handleLoadSerialPort () {
     })
 }
 
-function handleCopyToClipboard() {
+function copyToClipboard() {
   const text = inputSerialNumber.value
 
   navigator.clipboard.writeText(text)
@@ -421,6 +420,8 @@ function closeModal () {
   checkboxConnectionMode.checked = false
 
   inputSerialNumber.value = ""
+  spanInfoModelVersion.innerHTML = `Modelo: - | Versão: -`
+  spanInfoSerialNumber.innerHTML = `Número Serial: -`
 
   selectSyncMode.selectedIndex = 0
 
@@ -440,11 +441,11 @@ function closeModal () {
   const errorMessageRemoteQueue = inputRemoteQueue.parentNode.querySelector(".error-message")
   const errorMessageDefaultRemoteItem = inputDefaultRemoteItem.parentNode.querySelector(".error-message")
 
-  errorMessageName && errorMessageName.remove()
-  errorMessageContainerFormField && errorMessageContainerFormField.remove()
-  errorMessageSerialNumber && errorMessageSerialNumber.remove()
-  errorMessageRemoteQueue && errorMessageRemoteQueue.remove()
-  errorMessageDefaultRemoteItem && errorMessageDefaultRemoteItem.remove()
+  if (errorMessageName) errorMessageName.remove()
+  if (errorMessageContainerFormField) errorMessageContainerFormField.remove()
+  if (errorMessageSerialNumber) errorMessageSerialNumber.remove()
+  if (errorMessageRemoteQueue) errorMessageRemoteQueue.remove()
+  if (errorMessageDefaultRemoteItem) errorMessageDefaultRemoteItem.remove()
 
   modal.close()
 }

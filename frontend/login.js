@@ -1,16 +1,22 @@
+// * --------------------------- Variables ---------------------------
 const ERROR_MESSAGE = {
   401: "Usuário ou senha inválidos",
   500: "Servidor indisponível"
 }
 
+const URL_API_SERVER = "http://192.168.0.159:4000/api"
+
+// * --------------------------- Elements from DOM ---------------------------
 const form = document.querySelector("form")
 
 const containerToast = document.getElementById("toast")
 const spanToast = document.getElementById("toast-error")
 
-form.addEventListener("submit", onSubmit)
+// * --------------------------- Add event listeners ---------------------------
+form.addEventListener("submit", login)
 
-function onSubmit (event) {
+// * --------------------------- Functions ---------------------------
+function login (event) {
   event.preventDefault()
 
   const username = document.getElementById("username")
@@ -21,7 +27,7 @@ function onSubmit (event) {
     password: password.value
   }
 
-  fetch("http://192.168.0.159:4000/api/login", {
+  fetch(`${URL_API_SERVER}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(loginData)
