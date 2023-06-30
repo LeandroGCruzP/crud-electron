@@ -15,16 +15,21 @@ const token = sessionStorage.getItem("token")
 const divToast = document.querySelector("#toast")
 const spanToast = document.querySelector("#toast-error")
 
-const modalDelete = document.querySelector(".modal-delete")
-const btnCloseModalDelete = document.querySelector(".btn-close-modal-delete")
-const btnCancelModalDelete = document.querySelector(".btn-cancel-modal-delete")
+const spinner = document.querySelector(".spinner")
+const btnRefetchDevices = document.querySelector(".btn-refetch")
+
+const btnOpenModalCreate = document.querySelector(".btn-create")
 const modalCreate = document.querySelector(".modal-create")
 const btnCloseModalCreate = document.querySelector(".btn-close-modal-create")
 const btnCancelModalCreate = document.querySelector(".btn-cancel-modal-create")
-const spinner = document.querySelector(".spinner")
-const btnRefetchDevices = document.querySelector(".btn-refetch")
-const btnOpenModalCreate = document.querySelector(".btn-create")
-const btnLogout = document.querySelector(".btn-logout")
+
+const btnConfirmModalCreateUpdate = document.querySelector(".btn-confirm-create-update")
+
+const modalDelete = document.querySelector(".modal-delete")
+const inputHidden = document.querySelector(".input-hidden")
+const btnCloseModalDelete = document.querySelector(".btn-close-modal-delete")
+const btnCancelModalDelete = document.querySelector(".btn-cancel-modal-delete")
+const btnConfirmModalDelete = document.querySelector(".btn-confirm-delete")
 
 const form = document.querySelector("form")
 const inputName = document.querySelector("#name")
@@ -40,6 +45,7 @@ const selectSyncMode = document.querySelector("#sync-mode")
 const inputRemoteQueue = document.querySelector("#remote-queue")
 const inputDefaultRemoteItem = document.querySelector("#remote-item")
 
+const btnLogout = document.querySelector(".btn-logout")
 const spanUserLogged = document.querySelector(".user-logged")
 
 // * ----------------------------------------------------------------------------------------------- Initial load
@@ -62,12 +68,13 @@ listPorts()
 btnRefetchDevices.addEventListener("click", () => { listDevices(), listPorts() })
 btnCloseModalDelete.addEventListener("click", closeModalDelete)
 btnCancelModalDelete.addEventListener("click", closeModalDelete)
+btnConfirmModalDelete.addEventListener("click", () => deleteDevice(inputHidden.value))
 btnOpenModalCreate.addEventListener("click", openModalCreate)
 btnCloseModalCreate.addEventListener("click", closeModalCreate)
 btnCancelModalCreate.addEventListener("click", closeModalCreate)
 btnLogout.addEventListener("click", logout)
 
-form.addEventListener("submit", createDevice)
+form.addEventListener("submit", createUpdateDevice)
 checkboxConnectionMode.addEventListener("click", handleCheckbox)
 iconCopyToClipboard.addEventListener("click", copyToClipboard)
 selectSyncMode.addEventListener("change", handleSyncMode)
@@ -193,14 +200,14 @@ function listDevices () {
             <td>${device.syncStatus}</td>
             <td>
               <div class="actions">
-                <div class="action-update">
+                <div id=${device.id} class="action-update">
                   <svg width="24" height="24" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4.69408 17.3854L17.9508 4.12755C18.4746 3.62636 19.1737 3.35015 19.8986 3.35808C20.6234 3.366 21.3164 3.65742 21.829 4.16993C22.3417 4.68244 22.6333 5.37531 22.6414 6.10017C22.6496 6.82503 22.3735 7.52426 21.8725 8.04813L8.61358 21.306C8.31112 21.6085 7.92588 21.8146 7.50642 21.8985L3.25 22.75L4.1015 18.4925C4.1854 18.0731 4.39159 17.6878 4.69408 17.3854Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M15.708 7.0415L18.958 10.2915" stroke="black" stroke-width="2"/>
                   </svg>
                 </div>
 
-                <div id={${device.id}} class="action-delete">
+                <div id=${device.id} class="action-delete">
                   <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6.99967 22.1667C6.99967 22.7855 7.24551 23.379 7.68309 23.8166C8.12068 24.2542 8.71417 24.5 9.33301 24.5H18.6663C19.2852 24.5 19.8787 24.2542 20.3163 23.8166C20.7538 23.379 20.9997 22.7855 20.9997 22.1667V8.16667H6.99967V22.1667ZM9.33301 10.5H18.6663V22.1667H9.33301V10.5ZM18.083 4.66667L16.9163 3.5H11.083L9.91634 4.66667H5.83301V7H22.1663V4.66667H18.083Z" fill="#FF0000"/>
                   </svg>
@@ -213,7 +220,7 @@ function listDevices () {
         tbody.innerHTML += row
       })
 
-      addDeleteButtonListeners()
+      addButtonListeners()
     })
     .catch(err => {
       if (err.message === "Failed to fetch") {
@@ -260,7 +267,51 @@ function listPorts () {
   })
 }
 
-function createDevice (event) {
+function listDevice (id) {
+  fetch(`${URL_API_SERVER}/devices/${id}`, {
+    method: "GET",
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
+  })
+    .then(res => {
+      if (!res.ok) {
+        toast("error", "Erro ao carregar dispositivo")
+        throw new Error("Erro ao carregar dispositivo")
+      }
+
+      return res.json()
+    })
+    .then(res => {
+      inputName.value = res.device.name
+      selectSerialPort.value = res.device.serialPort
+      checkboxConnectionMode.checked = res.device.connectionMode === "Auto" ? true : false
+      inputSerialNumber.value = res.device.serialNumber
+      selectSyncMode.value = res.device.syncMode
+
+      if (res.device.connectionMode === "Auto") {
+        selectSerialPort.disabled = true
+        selectSerialPort.style.cursor = "not-allowed"
+        selectSerialPort.style.backgroundColor = "#EEEEEE"
+
+        btnLoadSerialPort.disabled = true
+        btnLoadSerialPort.style.cursor = "not-allowed"
+        btnLoadSerialPort.style.backgroundColor = "#878787"
+        btnLoadSerialPort.style.filter = "brightness(1)"
+      } else {
+        selectSerialPort.disabled = false
+        selectSerialPort.style.cursor = "auto"
+        selectSerialPort.style.backgroundColor = "transparent"
+
+        btnLoadSerialPort.disabled = false
+        btnLoadSerialPort.style.cursor = "pointer"
+        btnLoadSerialPort.style.backgroundColor = "#A80000"
+      }
+    })
+    .catch(err => {
+      console.error("[ERROR LIST DEVICE] >", err.message)
+    })
+}
+
+function createUpdateDevice (event) {
   event.preventDefault()
 
   // * validate fields before submit to API
@@ -306,7 +357,7 @@ function createDevice (event) {
 
   const deviceData = {
     name: inputName.value,
-    serialPort: selectSerialPort.value ? selectSerialPort.value : undefined,
+    serialPort: (selectSerialPort.value && !checkboxConnectionMode.checked) ? selectSerialPort.value : undefined,
     connectionMode: checkboxConnectionMode.checked ? "Auto" : "Fixed",
     serialNumber: inputSerialNumber.value ? inputSerialNumber.value : undefined,
     syncMode: selectSyncMode.value,
@@ -314,24 +365,72 @@ function createDevice (event) {
     defaultRemoteItem: inputDefaultRemoteItem.value ? inputDefaultRemoteItem.value : undefined,
   }
 
-  fetch(`${URL_API_SERVER}/devices`, {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(deviceData)
+  if(btnConfirmModalCreateUpdate.textContent === "Adicionar") {
+    fetch(`${URL_API_SERVER}/devices`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(deviceData)
+    })
+      .then(res => {
+        if (!res.ok) {
+          console.log(res)
+
+          toast("error", "Erro ao adicionar dispositivo")
+          throw new Error("Erro ao adicionar dispositivo")
+        }
+
+        closeModalCreate()
+        listDevices()
+        toast("success", "Dispositivo adicionado com sucesso")
+      })
+      .catch(err => {
+        console.error("[ERROR CREATE DEVICE] >", err.message)
+      })
+  }
+
+  if(btnConfirmModalCreateUpdate.textContent === "Atualizar") {
+    const id = inputHidden.value
+
+    fetch(`${URL_API_SERVER}/devices/${id}`, {
+      method: "PUT",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(deviceData)
+    })
+      .then(res => {
+        if (!res.ok) {
+          console.log(res)
+
+          toast("error", "Erro ao atualizar dispositivo")
+          throw new Error("Erro ao atualizar dispositivo")
+        }
+
+        closeModalCreate()
+        listDevices()
+        toast("success", "Dispositivo atualizado com sucesso")
+      })
+      .catch(err => {
+        console.error("[ERROR UPDATE DEVICE] >", err.message)
+      })
+  }
+}
+
+function deleteDevice (id) {
+  fetch(`${URL_API_SERVER}/devices/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
   })
     .then(res => {
       if (!res.ok) {
-        toast("error", "Erro ao adicionar dispositivo")
-        throw new Error("Erro ao adicionar dispositivo")
+        toast("error", "Erro ao deletar dispositivo")
+        throw new Error("Erro ao deletar dispositivo")
       }
 
-      toast("success", "Dispositivo adicionado com sucesso")
+      closeModalDelete()
       listDevices()
-      listPorts()
-      closeModalCreate()
+      toast("success", "Dispositivo deletado com sucesso")
     })
     .catch(err => {
-      console.error("[ERROR CREATE DEVICE] >", err.message)
+      console.error("[ERROR DELETE DEVICE] >", err.message)
     })
 }
 
@@ -457,6 +556,8 @@ function closeModalCreate () {
 }
 
 function openModalCreate () {
+  btnConfirmModalCreateUpdate.innerHTML = "Adicionar"
+
   modalCreate.showModal()
 }
 
@@ -464,18 +565,31 @@ function closeModalDelete () {
   modalDelete.close()
 }
 
-function addDeleteButtonListeners () {
-  const btnOpenModalDeleteList = document.querySelectorAll(".action-delete");
+function addButtonListeners () {
+  const btnOpenModalDelete = document.querySelectorAll(".action-delete");
+  const btnOpenModalUpdate = document.querySelectorAll(".action-update");
 
-  btnOpenModalDeleteList.forEach(btn => {
-    console.log(btn.id)
-    btn.addEventListener("click", () => modalDelete.showModal())
+  btnOpenModalDelete.forEach(btn => {
+    btn.addEventListener("click", () => {
+      inputHidden.value = btn.id
+
+      modalDelete.showModal()
+    })
+  })
+
+  btnOpenModalUpdate.forEach(btn => {
+    btn.addEventListener("click", () => {
+      listDevice(btn.id)
+      inputHidden.value = btn.id
+      btnConfirmModalCreateUpdate.innerHTML = "Atualizar"
+
+      modalCreate.showModal()
+    })
   })
 }
 
 function handleCheckbox () {
   if (checkboxConnectionMode.checked) {
-    selectSerialPort.value = ""
     selectSerialPort.disabled = true
     selectSerialPort.style.cursor = "not-allowed"
     selectSerialPort.style.backgroundColor = "#EEEEEE"
@@ -485,7 +599,6 @@ function handleCheckbox () {
     btnLoadSerialPort.style.backgroundColor = "#878787"
     btnLoadSerialPort.style.filter = "brightness(1)"
   } else {
-    selectSerialPort.selectedIndex = 0
     selectSerialPort.disabled = false
     selectSerialPort.style.cursor = "auto"
     selectSerialPort.style.backgroundColor = "transparent"

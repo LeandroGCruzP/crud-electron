@@ -61,7 +61,7 @@
 
         <div class="actions">
           <button class="btn-refetch">Refetch</button>
-          <button class="btn-create">Criar</button>
+          <button class="btn-create">Adicionar</button>
         </div>
       </header>
 
@@ -160,7 +160,7 @@
 
       <div class="actions">
         <button type="button" class="btn-cancel-modal-create">Cancelar</button>
-        <button type="submit">Adicionar</button>
+        <button type="submit" class="btn-confirm-create-update"></button>
       </div>
     </form>
   </dialog>
@@ -177,12 +177,13 @@
     </header>
 
     <main>
-      <p>Esta ação é permanente e excluirá permanentemente o dispositivo <b>Central 4<b>.</p>
+      <p>Esta ação é permanente e excluirá permanentemente o dispositivo.</p>
+      <input class="input-hidden" type="text" />
     </main>
 
     <footer>
       <button type="button" class="btn-cancel-modal-delete">Cancelar</button>
-      <button type="button">Eliminar</button>
+      <button type="button" class="btn-confirm-delete">Eliminar</button>
     </footer>
   </dialog>
 

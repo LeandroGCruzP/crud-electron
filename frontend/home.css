@@ -205,6 +205,10 @@ dialog header .title {
   background-color: transparent;
 }
 
+.modal-delete main input {
+  display: none;
+}
+
 .modal-delete footer {
   display: flex;
   width: 100%;
